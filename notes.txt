@@ -1,0 +1,17 @@
+
+# oauth2 flow explained 
+#auth server ll manage token creation and verfication => spring-boot-starter-oauth2-authorization-server
+#client app (front end exammple ) : ll call auth server to get token => spring-boot-starter-oauth2-client
+#ouath2 resource app : u can call it only by using a valid token expl (ur ms ) => spring-security-oauth2-resource-server
+
+
+#http://localhost:9000/oauth2/authorize?response_type=code&client_id=nbs&state=PcF7UjHDmYvmhwpKfv9zVosy0ZBIA2pZe7HHPixZ76E%253D&scope=openid&redirect_uri=http://127.0.0.1:8080/login/oauth2/code/oidc-client
+#=> get from browser redirect u to login page
+
+#http://localhost:9000/.well-known/oauth-authorization-server
+
+#in token url u have to use post with body with url form-encoded
+#http://localhost:9000/oauth2/token + param : code +grant_type+redirect_uri+client_id+
+auth basic with  app client id + app password (not user id + not user pwd)
+
+ 
