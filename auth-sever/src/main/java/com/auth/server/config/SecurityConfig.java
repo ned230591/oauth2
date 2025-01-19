@@ -9,12 +9,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.BaseLdapPathContextSource;
+import org.springframework.ldap.core.support.LdapContextSource;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.ldap.LdapBindAuthenticationManagerFactory;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -91,7 +98,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
+   /* @Bean
     public UserDetailsService userDetailsService() {
         UserDetails userDetails = User.withDefaultPasswordEncoder()
                 .username("user")
@@ -100,7 +107,7 @@ public class SecurityConfig {
                 .build();
 
         return new InMemoryUserDetailsManager(userDetails);
-    }
+    }*/
 
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
@@ -176,6 +183,26 @@ public class SecurityConfig {
         };
     }
 
+    @Bean
+    public LdapTemplate ldapTemplate() {
+        return new LdapTemplate(contextSource());
+    }
+
+    @Bean
+    public LdapContextSource contextSource() {
+        LdapContextSource ldapContextSource = new LdapContextSource();
+        ldapContextSource.setUrl("ldap://ldap.forumsys.com:389");
+        ldapContextSource.setUserDn("uid={0},dc=example,dc=com");
+        ldapContextSource.setPassword("password");
+        return ldapContextSource;
+    }
+
+    @Bean
+    AuthenticationManager authManager(BaseLdapPathContextSource source) {
+        LdapBindAuthenticationManagerFactory factory = new LdapBindAuthenticationManagerFactory(source);
+        factory.setUserDnPatterns("uid={0},dc=example,dc=com");
+        return factory.createAuthenticationManager();
+    }
 
 }
 
